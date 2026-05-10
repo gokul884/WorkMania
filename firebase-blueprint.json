@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "Client": {
+      "title": "Client",
+      "description": "A client entity representing a person or company.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the owner." },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "company": { "type": "string" },
+        "avatar": { "type": "string" }
+      },
+      "required": ["userId", "name", "email", "company"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "A project managed by the user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "clientId": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "completed", "on-hold", "pending"] },
+        "budget": { "type": "number" },
+        "dueDate": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["userId", "name", "clientId", "status"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A specific task within a project.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "status": { "type": "string", "enum": ["todo", "in-progress", "done"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+        "dueDate": { "type": "string" }
+      },
+      "required": ["userId", "projectId", "title", "status"]
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "A billing document for a client.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["paid", "unpaid", "overdue", "draft"] },
+        "date": { "type": "string" },
+        "dueDate": { "type": "string" }
+      },
+      "required": ["userId", "clientId", "amount", "status"]
+    },
+    "Activity": {
+      "title": "Activity",
+      "description": "Log of user actions.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["project", "task", "invoice", "client"] },
+        "action": { "type": "string" },
+        "target": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["userId", "type", "action", "target", "timestamp"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile settings.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "bio": { "type": "string" },
+        "avatarUrl": { "type": "string" }
+      },
+      "required": ["displayName"]
+    }
+  },
+  "firestore": {
+    "clients": { "schema": "Client", "description": "User clients." },
+    "projects": { "schema": "Project", "description": "User projects." },
+    "tasks": { "schema": "Task", "description": "User tasks." },
+    "invoices": { "schema": "Invoice", "description": "User invoices." },
+    "activities": { "schema": "Activity", "description": "User activity log." },
+    "users": { "schema": "UserProfile", "description": "User profiles." }
+  }
+}

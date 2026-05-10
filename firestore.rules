@@ -1,0 +1,153 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // -------------------------------------------------------------------------
+    // GLOBAL HELPERS
+    // -------------------------------------------------------------------------
+    function isSignedIn() { return request.auth != null; }
+    function isEmailVerified() { return isSignedIn() && (request.auth.token.email_verified == true); }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    
+    function isValidString(val, max) {
+      return val is string && val.size() <= max;
+    }
+
+    // -------------------------------------------------------------------------
+    // VALIDATION HELPERS
+    // -------------------------------------------------------------------------
+    
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['displayName'])
+        && data.keys().size() >= 1 && data.keys().size() <= 3
+        && isValidString(data.displayName, 100)
+        && (data.get('bio', '') is string && data.get('bio', '').size() <= 500)
+        && (data.get('avatarUrl', '') is string && data.get('avatarUrl', '').size() <= 2048);
+    }
+
+    function isValidClient(data) {
+      return data.keys().hasAll(['userId', 'name', 'email', 'company'])
+        && data.keys().size() >= 4 && data.keys().size() <= 5
+        && data.userId == request.auth.uid
+        && isValidString(data.name, 100)
+        && isValidString(data.email, 150)
+        && isValidString(data.company, 150)
+        && (data.get('avatar', '') is string && data.get('avatar', '').size() <= 2048);
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['userId', 'name', 'clientId', 'status'])
+        && data.keys().size() >= 4 && data.keys().size() <= 7
+        && data.userId == request.auth.uid
+        && isValidString(data.name, 150)
+        && isValidId(data.clientId)
+        && data.status in ['active', 'completed', 'on-hold', 'pending']
+        && (data.get('budget', 0) is number)
+        && (data.get('dueDate', '') is string && data.get('dueDate', '').size() <= 50)
+        && (data.get('description', '') is string && data.get('description', '').size() <= 2000);
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasAll(['userId', 'projectId', 'title', 'status'])
+        && data.keys().size() >= 4 && data.keys().size() <= 6
+        && data.userId == request.auth.uid
+        && isValidId(data.projectId)
+        && isValidString(data.title, 300)
+        && data.status in ['todo', 'in-progress', 'done']
+        && (data.get('priority', 'medium') in ['low', 'medium', 'high'])
+        && (data.get('dueDate', '') is string && data.get('dueDate', '').size() <= 50);
+    }
+
+    function isValidInvoice(data) {
+      return data.keys().hasAll(['userId', 'clientId', 'amount', 'status'])
+        && data.keys().size() >= 4 && data.keys().size() <= 6
+        && data.userId == request.auth.uid
+        && isValidId(data.clientId)
+        && data.amount is number
+        && data.status in ['paid', 'unpaid', 'overdue', 'draft']
+        && (data.get('date', '') is string && data.get('date', '').size() <= 50)
+        && (data.get('dueDate', '') is string && data.get('dueDate', '').size() <= 50);
+    }
+
+    function isValidActivity(data) {
+      return data.keys().hasAll(['userId', 'type', 'action', 'target', 'timestamp'])
+        && data.keys().size() == 5
+        && data.userId == request.auth.uid
+        && data.type in ['project', 'task', 'invoice', 'client']
+        && isValidString(data.action, 100)
+        && isValidString(data.target, 200)
+        && (data.timestamp is string && data.timestamp.size() <= 100);
+    }
+
+    // -------------------------------------------------------------------------
+    // CATCH-ALL DENY
+    // -------------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // COLLECTIONS
+    // -------------------------------------------------------------------------
+    
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Profiles shouldn't be listable by others
+      allow create: if isOwner(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidUserProfile(incoming())
+        && incoming().diff(existing()).affectedKeys().hasAny(['displayName', 'bio', 'avatarUrl']);
+    }
+
+    match /clients/{clientId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(clientId) && isValidClient(incoming());
+      allow update: if isOwner(existing().userId) && isValidClient(incoming())
+        && incoming().userId == existing().userId;
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /projects/{projectId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(projectId) && isValidProject(incoming());
+      allow update: if isOwner(existing().userId) && isValidProject(incoming())
+        && incoming().userId == existing().userId;
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /tasks/{taskId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(taskId) && isValidTask(incoming());
+      allow update: if isOwner(existing().userId) && isValidTask(incoming())
+        && incoming().userId == existing().userId;
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /invoices/{invoiceId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(invoiceId) && isValidInvoice(incoming());
+      allow update: if isOwner(existing().userId) && isValidInvoice(incoming())
+        && incoming().userId == existing().userId;
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /activities/{activityId} {
+      allow get: if isOwner(existing().userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(activityId) && isValidActivity(incoming());
+      // Activities are usually immutable logs, but we'll allow update if needed by same logic
+      allow update: if isOwner(existing().userId) && isValidActivity(incoming())
+        && incoming().userId == existing().userId;
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}
+

@@ -1,23 +1,33 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Bell, Save, Camera, Moon, Sun } from 'lucide-react';
+import { User, Bell, Save, Camera, Moon, Sun, Check, X as CloseIcon } from 'lucide-react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Card } from '../components/UI';
 import { User as FirebaseUser } from 'firebase/auth';
+import Cropper from 'react-easy-crop';
+import { Modal } from '../components/Modal';
 
 interface SettingsProps {
   user: FirebaseUser | null;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
 }
 
-export default function Settings({ user }: SettingsProps) {
+export default function Settings({ user, theme, setTheme }: SettingsProps) {
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // States for cropping
+  const [showCropper, setShowCropper] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -30,7 +40,7 @@ export default function Settings({ user }: SettingsProps) {
           setDisplayName(data.displayName || '');
           setBio(data.bio || '');
           setAvatarUrl(data.avatarUrl || null);
-          setTheme(data.theme || 'dark');
+          if (data.theme) setTheme(data.theme);
         } else {
           setDisplayName(user.displayName || '');
         }
@@ -39,22 +49,69 @@ export default function Settings({ user }: SettingsProps) {
       }
     };
     fetchProfile();
-  }, [user]);
+  }, [user, setTheme]);
+
+  const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 800 * 1024) {
-        alert('File size exceeds 800KB limit');
+      if (file.size > 2 * 1024 * 1024) { 
+        alert('File size exceeds 2MB limit');
         return;
       }
       
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarUrl(reader.result as string);
+        setImageToCrop(reader.result as string);
+        setShowCropper(true);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const createCroppedImage = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+
+    const image = new Image();
+    image.src = imageToCrop;
+    await new Promise((res) => (image.onload = res));
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const maxSize = 400; 
+    let width = croppedAreaPixels.width;
+    let height = croppedAreaPixels.height;
+
+    if (width > maxSize || height > maxSize) {
+      const ratio = Math.min(maxSize / width, maxSize / height);
+      width *= ratio;
+      height *= ratio;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    if (!ctx) return;
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      width,
+      height
+    );
+
+    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+    setAvatarUrl(base64Image);
+    setShowCropper(false);
+    setImageToCrop(null);
   };
 
   const handleSave = async () => {
@@ -118,6 +175,7 @@ export default function Settings({ user }: SettingsProps) {
                     onChange={handleAvatarChange} 
                     accept="image/*" 
                     className="hidden" 
+                    onClick={(e) => (e.target as HTMLInputElement).value = ''}
                   />
                 </div>
                 <div className="space-y-3 text-center sm:text-left">
@@ -127,7 +185,7 @@ export default function Settings({ user }: SettingsProps) {
                   >
                     Change Avatar
                   </button>
-                  <p className="text-xs text-slate-500 font-medium">PNG, JPG or SVG. Max size 800KB</p>
+                  <p className="text-xs text-slate-500 font-medium">PNG, JPG or SVG. Max size 2MB</p>
                 </div>
               </div>
 
@@ -207,6 +265,62 @@ export default function Settings({ user }: SettingsProps) {
           </Card>
         </div>
       </div>
+
+      {/* Cropper Modal */}
+      <Modal 
+        isOpen={showCropper} 
+        onClose={() => { setShowCropper(false); setImageToCrop(null); }} 
+        title="Crop Profile Image"
+      >
+        <div className="space-y-6">
+          <div className="relative h-64 sm:h-80 bg-slate-900 rounded-xl overflow-hidden border border-border-accent">
+            {imageToCrop && (
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            )}
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-text-dim uppercase tracking-widest leading-none">Zoom</label>
+              <input
+                type="range"
+                value={zoom}
+                min={1}
+                max={3}
+                step={0.1}
+                aria-labelledby="Zoom"
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="w-full h-1.5 bg-bg-deep rounded-full appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => { setShowCropper(false); setImageToCrop(null); }}
+                className="flex-1 px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-text-dim hover:text-text-main hover:bg-white/10 transition-all font-bold text-sm flex items-center justify-center gap-2"
+              >
+                <CloseIcon size={18} />
+                Cancel
+              </button>
+              <button 
+                onClick={createCroppedImage}
+                className="flex-1 btn-primary py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-sm shadow-xl shadow-primary/20"
+              >
+                <Check size={18} />
+                Apply Crop
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

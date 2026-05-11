@@ -16,6 +16,15 @@
   
   --shadow-indigo: 0 10px 15px -3px rgba(79, 70, 229, 0.1), 0 4px 6px -4px rgba(79, 70, 229, 0.1);
   --shadow-primary: 0 10px 15px -3px rgba(34, 211, 238, 0.2);
+
+  /* Custom Breakpoints */
+  --breakpoint-xs: 320px;
+  --breakpoint-xs-plus: 375px;
+  --breakpoint-sm-minus: 425px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-tablet-wide: 820px;
+  --breakpoint-laptop: 1025px;
+  --breakpoint-desktop: 1441px;
 }
 
 :root {

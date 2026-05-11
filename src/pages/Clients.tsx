@@ -67,79 +67,76 @@ export default function Clients({ clients, setClients, setActivities, user }: Cl
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col tablet:flex-row tablet:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-main">Clients</h1>
-          <p className="text-text-dim">Manage your business relationships.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight">Clients</h1>
+          <p className="text-text-dim mt-1 font-medium">Manage and nurture your business relationships.</p>
         </div>
-        <button onClick={() => { setEditingClient(null); setIsModalOpen(true); }} className="btn-primary flex items-center gap-2">
-          <Plus size={18} />
+        <button 
+          onClick={() => { setEditingClient(null); setIsModalOpen(true); }} 
+          className="btn-primary flex items-center justify-center gap-2 w-full tablet:w-auto py-3 px-6"
+        >
+          <Plus size={20} strokeWidth={2.5} />
           <span>Add Client</span>
         </button>
       </div>
 
-      <div className="bg-bg-card p-1 rounded-xl border border-border-accent">
+      <div className="bg-bg-card p-1.5 rounded-2xl border border-border-accent/50 shadow-inner">
         <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-dim" />
           <input 
             type="text" 
-            placeholder="Search clients..." 
+            placeholder="Search by name or company..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-transparent outline-none text-sm text-text-main"
+            className="w-full pl-11 pr-4 py-3 bg-transparent outline-none text-sm sm:text-base text-text-main placeholder:text-text-dim/50 font-medium"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-3 gap-5 sm:gap-6">
         {filteredClients.map((client) => (
-          <Card key={client.id} className="relative group hover:border-primary/20 transition-all">
-            <div className="flex justify-between items-center gap-4">
+          <Card key={client.id} className="relative group hover:border-primary/30 transition-all border-border-accent/40">
+            <div className="flex justify-between items-start gap-4">
               <div className="flex items-center gap-4 min-w-0">
-                <div className="w-16 h-16 rounded-2xl bg-bg-card border border-border-accent flex items-center justify-center text-text-dim group-hover:text-primary transition-colors">
-                  <Building size={32} />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/10 group-hover:scale-105 transition-all">
+                  <Building size={28} sm-size={32} />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-bold text-text-main truncate text-lg">{client.name}</h3>
-                  <p className="text-sm text-text-dim truncate font-medium">{client.company}</p>
+                  <h3 className="font-bold text-text-main truncate text-base sm:text-lg tracking-tight group-hover:text-primary transition-colors">{client.name}</h3>
+                  <p className="text-xs sm:text-sm text-text-dim truncate font-semibold uppercase tracking-wider opacity-70">{client.company}</p>
                 </div>
               </div>
               <button 
                 onClick={() => handleDelete(client.id)}
-                className="p-2 text-slate-500 hover:text-rose-500 transition-colors"
+                className="p-2 text-text-dim hover:text-rose-400 hover:bg-rose-400/10 rounded-xl transition-all"
                 title="Delete Client"
               >
-                <Trash2 size={20} />
+                <Trash2 size={18} />
               </button>
             </div>
             
-            <div className="mt-6 space-y-4">
-              <div className="flex items-center gap-3 text-sm text-text-main">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-primary/70">
+            <div className="mt-6 space-y-3 sm:space-y-4">
+              <div className="flex items-center gap-3 text-sm text-text-main bg-white/[0.02] p-2 sm:p-3 rounded-xl border border-white/[0.05]">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-primary/70 shrink-0">
                   <Mail size={16} />
                 </div>
-                <span className="truncate">{client.email}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-text-main">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-primary/70">
-                  <Building size={16} />
-                </div>
-                <span>Client since 2024</span>
+                <span className="truncate font-medium">{client.email}</span>
               </div>
             </div>
 
-            <div className="mt-8 flex gap-3">
+            <div className="mt-8 flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button 
                 onClick={() => { setEditingClient(client); setIsModalOpen(true); }}
-                className="flex-1 btn-secondary text-sm h-10 flex items-center justify-center gap-2"
+                className="flex-1 btn-secondary text-sm py-2.5 flex items-center justify-center gap-2 font-bold"
               >
                 <Edit size={16} />
-                Edit
+                Edit Profile
               </button>
-              <button className="flex-1 btn-secondary text-sm h-10 flex items-center justify-center gap-2 text-primary hover:text-cyan-300">
+              <button className="flex-1 btn-secondary text-sm py-2.5 flex items-center justify-center gap-2 text-primary hover:text-cyan-300 font-bold">
                 <ExternalLink size={16} />
-                Portal
+                Client Portal
               </button>
             </div>
           </Card>

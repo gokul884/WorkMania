@@ -74,12 +74,19 @@ export default function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [profile, setProfile] = useState<{ displayName?: string, avatarUrl?: string, theme?: string } | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    }
+    return 'dark';
+  });
   const [deadlineReminders, setDeadlineReminders] = useState<string[]>([]);
 
   useEffect(() => {
     // Apply theme to document
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   useEffect(() => {
@@ -309,7 +316,7 @@ export default function App() {
                   <Route path="clients" element={<Clients {...contextValue} />} />
                   <Route path="tasks" element={<Tasks {...contextValue} />} />
                   <Route path="invoices" element={<Invoices {...contextValue} />} />
-                  <Route path="settings" element={<SettingsPage user={user} />} />
+                  <Route path="settings" element={<SettingsPage user={user} theme={theme} setTheme={setTheme} />} />
                   <Route path="notifications" element={<NotificationsPage activities={activities} />} />
                 </Routes>
               </DashboardLayout>
@@ -366,24 +373,24 @@ function DashboardLayout({ children, isSidebarOpen, setIsSidebarOpen, user, prof
   }, [location.pathname]);
 
   return (
-    <div className="flex h-screen bg-bg-deep overflow-hidden text-text-main">
+    <div className="flex h-screen bg-bg-deep overflow-hidden text-text-main flex-col lg:flex-row">
       <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} setIsOpen={setIsSidebarOpen} />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-20 bg-bg-deep border-b border-border-accent flex items-center justify-between px-6 sticky top-0 z-10">
-          <div className="flex items-center gap-4 lg:hidden">
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 -ml-2 text-text-dim hover:text-text-main">
-              <Menu size={20} />
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <header className="h-20 bg-bg-deep border-b border-border-accent flex items-center justify-between px-4 sm:px-6 sticky top-0 z-10">
+          <div className="flex items-center gap-3 lg:hidden">
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-text-dim hover:text-text-main rounded-xl hover:bg-white/5 transition-all">
+              <Menu size={22} />
             </button>
-            <span className="font-bold text-xl text-primary">WM</span>
+            <span className="font-extrabold text-xl text-primary tracking-tighter">WM</span>
           </div>
 
-          <div className="flex-1 max-w-md hidden md:block">
+          <div className="flex-1 max-w-md hidden md:block mx-8">
             <div className="relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" />
               <input 
                 type="text" 
-                placeholder="Search projects, clients..." 
+                placeholder="Search everything..." 
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -412,13 +419,13 @@ function DashboardLayout({ children, isSidebarOpen, setIsSidebarOpen, user, prof
                             <button
                               key={`${result.type}-${result.id}`}
                               onClick={() => handleSearchResultClick(result.path)}
-                              className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-white/5 transition-colors text-left"
+                              className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors text-left"
                             >
                               <div className="flex items-center gap-3">
                                 {result.type === 'project' ? <Briefcase size={16} className="text-primary" /> : <Users size={16} className="text-violet-400" />}
                                 <span className="text-sm font-medium text-text-main">{result.name}</span>
                               </div>
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-text-dim">{result.type}</span>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-text-dim px-2 py-0.5 bg-white/5 rounded-md">{result.type}</span>
                             </button>
                           ))}
                         </div>
@@ -434,34 +441,80 @@ function DashboardLayout({ children, isSidebarOpen, setIsSidebarOpen, user, prof
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Link to="/notifications" className="p-2 text-text-dim hover:text-text-main hover:bg-white/5 rounded-xl transition-all relative">
+          <div className="flex items-center gap-2 sm:gap-4 ml-auto lg:ml-0">
+            <Link to="/notifications" className="p-2.5 text-text-dim hover:text-text-main hover:bg-white/5 rounded-xl transition-all relative">
               <Bell size={20} />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-bg-deep"></span>
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-bg-deep animate-pulse"></span>
             </Link>
-            <div className="w-px h-6 bg-border-accent mx-1"></div>
-            <Link to="/settings" className="flex items-center gap-3 hover:bg-white/5 p-1 rounded-xl transition-all h-12">
+            <div className="w-px h-6 bg-border-accent mx-1 hidden xs:block"></div>
+            <Link to="/settings" className="flex items-center gap-3 hover:bg-white/5 p-1 sm:p-1 rounded-xl transition-all h-11 sm:h-12 border border-transparent hover:border-border-accent">
               <div className="text-right hidden sm:block px-2">
-                <p className="text-sm font-bold text-text-main truncate max-w-[150px]">{profile?.displayName || user?.displayName || 'User'}</p>
-                <p className="text-xs text-text-dim font-medium tracking-wide uppercase truncate max-w-[120px]">{user?.email}</p>
+                <p className="text-sm font-bold text-text-main truncate max-w-[150px] leading-tight">{profile?.displayName || user?.displayName || 'User'}</p>
+                <p className="text-[10px] text-text-dim font-bold tracking-wider uppercase truncate max-w-[120px] mt-0.5">{user?.email}</p>
               </div>
               <img 
                 src={profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || user?.email || 'User'}`} 
                 alt="Profile" 
-                className="w-10 h-10 rounded-xl bg-bg-card border border-border-accent object-cover"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-bg-card border border-border-accent object-cover ring-2 ring-primary/5 shadow-inner"
                 referrerPolicy="no-referrer"
               />
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-          <div className="max-w-7xl mx-auto">
+        {/* Mobile Search Bar Stack */}
+        <div className="md:hidden bg-bg-deep px-4 py-3 border-b border-border-accent">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" />
+            <input 
+              type="text" 
+              placeholder="Search..." 
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsSearching(true);
+              }}
+              className="w-full bg-bg-card border border-border-accent rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:border-primary/50 transition-colors"
+            />
+          </div>
+        </div>
+
+        <main className="flex-1 overflow-y-auto p-4 tablet:p-6 laptop:p-8 custom-scrollbar pb-24 lg:pb-8">
+          <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>
+
+        {/* Mobile Bottom Navigation */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-bg-card/80 backdrop-blur-xl border-t border-border-accent z-[60] px-4 flex items-center justify-around translate-y-0 shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.3)]">
+          <BottomNavItem to="/" icon={<LayoutDashboard size={20} />} label="Home" active={location.pathname === '/'} />
+          <BottomNavItem to="/projects" icon={<Briefcase size={20} />} label="Projects" active={location.pathname === '/projects'} />
+          <BottomNavItem to="/tasks" icon={<CheckSquare size={20} />} label="Tasks" active={location.pathname === '/tasks'} />
+          <BottomNavItem to="/invoices" icon={<FileText size={20} />} label="Invoices" active={location.pathname === '/invoices'} />
+          <BottomNavItem to="/settings" icon={<Settings size={20} />} label="Settings" active={location.pathname === '/settings'} />
+        </div>
       </div>
     </div>
+  );
+}
+
+function BottomNavItem({ to, icon, label, active }: { to: string, icon: React.ReactNode, label: string, active: boolean }) {
+  return (
+    <Link 
+      to={to} 
+      className={`flex flex-col items-center justify-center gap-1 transition-all px-3 py-1 rounded-xl ${active ? 'text-primary' : 'text-text-dim'}`}
+    >
+      <div className={`transition-transform duration-300 ${active ? 'scale-110 -translate-y-0.5' : ''}`}>
+        {icon}
+      </div>
+      <span className={`text-[10px] font-bold tracking-tight lowercase ${active ? 'opacity-100' : 'opacity-60'}`}>{label}</span>
+      {active && (
+        <motion.div 
+          layoutId="bottom-nav-indicator"
+          className="w-1 h-1 bg-primary rounded-full absolute -bottom-1"
+        />
+      )}
+    </Link>
   );
 }
 
@@ -496,66 +549,84 @@ function Sidebar({ isOpen, toggle, setIsOpen }: { isOpen: boolean, toggle: () =>
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="lg:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40"
+            className="lg:hidden fixed inset-0 bg-bg-deep/80 backdrop-blur-md z-[55]"
           />
         )}
       </AnimatePresence>
 
       <aside 
-        className={`bg-bg-card border-r border-border-accent transition-all duration-300 fixed inset-y-0 left-0 z-50 lg:relative ${isOpen ? 'translate-x-0 w-64 shadow-2xl lg:shadow-none' : '-translate-x-full lg:translate-x-0 lg:w-20'}`}
+        className={`bg-bg-card border-r border-border-accent transition-all duration-500 fixed inset-y-0 left-0 z-[60] lg:relative lg:translate-x-0 ${isOpen ? 'translate-x-0 w-72 xs-plus:w-80 shadow-[20px_0_40px_-20px_rgba(0,0,0,0.5)]' : '-translate-x-full lg:w-20'}`}
       >
         <div className="flex flex-col h-full">
           <div className="h-20 flex items-center px-6 border-b border-border-accent">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white dark:text-slate-900 shrink-0">
-                  <Briefcase size={20} />
+                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white dark:text-slate-950 shrink-0 shadow-lg shadow-primary/20">
+                  <Briefcase size={22} strokeWidth={2.5} />
                 </div>
-                {isOpen && <span className="font-bold text-xl tracking-tight text-text-main">WorkMania</span>}
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex flex-col"
+                  >
+                    <span className="font-extrabold text-xl tracking-tighter text-text-main leading-none">WorkMania</span>
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest mt-0.5 opacity-70">Workspace</span>
+                  </motion.div>
+                )}
               </div>
-              <button onClick={() => setIsOpen(false)} className="lg:hidden p-2 text-text-dim hover:text-text-main">
+              <button onClick={() => setIsOpen(false)} className="lg:hidden p-2.5 text-text-dim hover:text-text-main bg-white/5 rounded-xl transition-all">
                 <Menu className="rotate-90" size={20} />
               </button>
             </div>
           </div>
 
-          <nav className="flex-1 px-4 py-8 space-y-2">
-            {navItems.map((item) => (
-              <Link 
-                key={item.path} 
-                to={item.path} 
-                className={location.pathname === item.path ? 'nav-item-active' : 'nav-item'}
-                title={!isOpen ? item.label : ''}
-              >
-                <item.icon size={20} className="shrink-0" />
-                {isOpen && <span className="whitespace-nowrap font-semibold">{item.label}</span>}
-              </Link>
-            ))}
+          <nav className="flex-1 px-4 py-8 space-y-1.5 custom-scrollbar overflow-y-auto">
+            {navItems.map((item) => {
+              const active = location.pathname === item.path;
+              return (
+                <Link 
+                  key={item.path} 
+                  to={item.path} 
+                  className={active ? 'nav-item-active' : 'nav-item'}
+                  title={!isOpen ? item.label : ''}
+                >
+                  <item.icon size={20} className={`shrink-0 transition-transform ${active ? 'scale-110' : ''}`} />
+                  {isOpen && <span className="whitespace-nowrap font-bold tracking-tight">{item.label}</span>}
+                  {active && isOpen && (
+                    <motion.div 
+                      layoutId="sidebar-active-indicator"
+                      className="ml-auto w-1.5 h-1.5 bg-white dark:bg-slate-900 rounded-full"
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
-          <div className="p-4 border-t border-border-accent space-y-2">
+          <div className="p-4 border-t border-border-accent space-y-2 pb-8 lg:pb-4">
             <Link 
               to="/settings" 
               className={location.pathname === '/settings' ? 'nav-item-active' : 'nav-item'}
               title={!isOpen ? 'Settings' : ''}
             >
               <Settings size={20} className="shrink-0" />
-              {isOpen && <span className="whitespace-nowrap font-semibold">Settings</span>}
+              {isOpen && <span className="whitespace-nowrap font-bold tracking-tight">Settings</span>}
             </Link>
             <button 
               onClick={handleLogout}
-              className="w-full nav-item text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
+              className="w-full nav-item text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 active:scale-[0.98]"
               title={!isOpen ? 'Log Out' : ''}
             >
               <LogOut size={20} className="shrink-0" />
-              {isOpen && <span className="whitespace-nowrap font-semibold">Log Out</span>}
+              {isOpen && <span className="whitespace-nowrap font-bold tracking-tight">Log Out</span>}
             </button>
             <button 
               onClick={toggle}
-              className="mt-4 w-full nav-item hidden lg:flex border border-border-accent bg-bg-card shadow-sm"
+              className="mt-4 w-full nav-item hidden lg:flex border border-border-accent bg-bg-card shadow-sm group active:scale-[0.98]"
             >
-              <Menu size={20} className={`shrink-0 transition-transform ${!isOpen ? 'rotate-180' : ''}`} />
-              {isOpen && <span className="whitespace-nowrap font-semibold">Collapse</span>}
+              <Menu size={20} className={`shrink-0 transition-transform group-hover:scale-110 ${!isOpen ? 'rotate-180' : ''}`} />
+              {isOpen && <span className="whitespace-nowrap font-bold tracking-tight">Collapse View</span>}
             </button>
           </div>
         </div>

@@ -125,78 +125,85 @@ export default function Projects({ projects, clients, user }: ProjectsProps) {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col tablet:flex-row tablet:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-main">Projects</h1>
-          <p className="text-text-dim">Manage and track all your active projects.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight">Projects</h1>
+          <p className="text-text-dim mt-1 font-medium">Manage and track all your active projects across workspace.</p>
         </div>
         <button 
           onClick={() => { setEditingProject(null); setIsModalOpen(true); }}
-          className="btn-primary flex items-center gap-2 self-start"
+          className="btn-primary flex items-center justify-center gap-2 w-full tablet:w-auto py-3 px-6"
         >
-          <Plus size={18} />
+          <Plus size={20} strokeWidth={2.5} />
           <span>New Project</span>
         </button>
       </div>
 
-      <div className="flex items-center gap-4 bg-bg-card p-1 rounded-xl border border-border-accent">
+      <div className="bg-bg-card p-1.5 rounded-2xl border border-border-accent/50 shadow-inner">
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-dim" />
           <input 
             type="text" 
-            placeholder="Search projects..." 
+            placeholder="Filter projects by name..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-transparent text-sm outline-none text-text-main"
+            className="w-full pl-11 pr-4 py-3 bg-transparent text-sm sm:text-base outline-none text-text-main placeholder:text-text-dim/50 font-medium"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-3 gap-5 sm:gap-6">
         {filteredProjects.map((project) => (
-          <Card key={project.id} className="group hover:ring-2 hover:ring-primary/20 transition-all">
+          <Card key={project.id} className="group hover:border-primary/40 transition-all border-border-accent/40 shadow-xl hover:shadow-primary/5">
             <div className="flex justify-between items-start mb-4">
-              <Badge variant={getStatusVariant(project.status)}>
+              <Badge variant={getStatusVariant(project.status)} className="px-3 py-1 text-[10px] font-bold tracking-widest">
                 {project.status.toUpperCase()}
               </Badge>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5 translate-x-1 -translate-y-1">
                 <button 
                   onClick={() => { setEditingProject(project); setIsModalOpen(true); }}
-                  className="p-1.5 text-slate-500 hover:text-primary transition-colors"
+                  className="p-2 text-text-dim hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                 >
                   <Edit size={16} />
                 </button>
                 <button 
                   onClick={() => handleDelete(project.id)}
-                  className="p-1.5 text-slate-500 hover:text-danger transition-colors"
+                  className="p-2 text-text-dim hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all"
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
             </div>
             
-            <h3 className="font-bold text-lg text-text-main line-clamp-1">{project.name}</h3>
-            <p className="text-text-dim text-sm mt-2 line-clamp-2 min-h-[40px] leading-relaxed">{project.description}</p>
+            <h3 className="font-bold text-lg sm:text-xl text-text-main line-clamp-1 tracking-tight group-hover:text-primary transition-colors">{project.name}</h3>
+            <p className="text-text-dim text-sm mt-2 line-clamp-2 min-h-[40px] leading-relaxed font-medium">
+              {project.description || "No description provided for this project."}
+            </p>
             
-            <div className="mt-6 pt-6 border-t border-border-accent space-y-4">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 text-text-dim">
-                  <Calendar size={14} className="text-primary/70" />
-                  <span>Due {format(new Date(project.dueDate), 'MMM d, yyyy')}</span>
+            <div className="mt-6 pt-6 border-t border-border-accent/50 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-text-dim font-bold text-xs uppercase tracking-wider">
+                  <Calendar size={14} className="text-primary" />
+                  <span>{format(new Date(project.dueDate), 'MMM d, yyyy')}</span>
                 </div>
-                <div className="flex items-center gap-1 font-bold text-text-main">
-                  <span className="text-emerald-500 text-lg">₹</span>
-                  <span>{project.budget.toLocaleString('en-IN')}</span>
+                <div className="flex items-center gap-1 font-black text-text-main">
+                  <span className="text-primary text-base">₹</span>
+                  <span className="text-lg tracking-tighter">{project.budget.toLocaleString('en-IN')}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              
+              <div className="flex items-center gap-3 bg-white/[0.02] p-2 rounded-xl border border-white/[0.05]">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold text-xs">
+                  {clients.find(c => c.id === project.clientId)?.company.charAt(0)}
+                </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] text-text-dim font-medium uppercase tracking-wider mb-0.5">Client</p>
-                  <p className="text-sm font-bold text-text-main truncate">
+                  <p className="text-[9px] text-text-dim font-black uppercase tracking-widest leading-none">Client</p>
+                  <p className="text-sm font-bold text-text-main truncate mt-1">
                     {clients.find(c => c.id === project.clientId)?.company}
                   </p>
                 </div>
+                <ChevronRight size={14} className="ml-auto text-text-dim opacity-30" />
               </div>
             </div>
           </Card>

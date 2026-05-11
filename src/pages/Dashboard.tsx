@@ -41,19 +41,19 @@ export default function Dashboard({ clients, projects, invoices, activities }: D
   }, [invoices, projects, clients]);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 sm:space-y-8 tablet:space-y-10 animate-in fade-in duration-500">
+      <div className="flex flex-col tablet:flex-row tablet:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-text-main tracking-tight">Project Overview</h1>
-          <p className="text-text-dim mt-1">Welcome back. Here's what needs your attention.</p>
+          <h1 className="text-2xl sm:text-3xl tablet:text-4xl font-extrabold text-text-main tracking-tight leading-tight">Project Overview</h1>
+          <p className="text-text-dim mt-1 text-sm sm:text-base font-medium">Welcome back. Here's what needs your attention today.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="primary" className="py-1 px-4">Workspace Active</Badge>
+          <Badge variant="primary" className="py-1.5 px-4 shadow-lg shadow-primary/10">Workspace Active</Badge>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 tablet:grid-cols-4 gap-3 sm:gap-4">
         <QuickActionButton icon={<Plus size={20} />} label="New Project" href="/projects" color="from-cyan-500/20 to-blue-500/20" />
         <QuickActionButton icon={<Plus size={20} />} label="Add Task" href="/tasks" color="from-purple-500/20 to-indigo-500/20" />
         <QuickActionButton icon={<Plus size={20} />} label="New Invoice" href="/invoices" color="from-emerald-500/20 to-teal-500/20" />
@@ -61,31 +61,35 @@ export default function Dashboard({ clients, projects, invoices, activities }: D
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-4 gap-4 sm:gap-6">
         {stats.map((stat) => (
-          <div key={stat.label} className="card-base p-6 hover:border-text-main/10 transition-colors">
+          <div key={stat.label} className="card-base p-5 sm:p-6 hover:border-primary/30 transition-all border-border-accent/50 group">
             <div className="flex items-start justify-between">
-              <div className={`p-3 rounded-xl ${stat.bg} ${stat.color} border border-border-accent`}>
-                <stat.icon size={24} />
+              <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} border border-border-accent bg-opacity-10 group-hover:scale-110 transition-transform`}>
+                <stat.icon size={26} strokeWidth={2.5} />
               </div>
-              <div className={`flex items-center gap-1 text-sm font-bold ${stat.trendUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <div className={`flex items-center gap-1 text-[13px] font-extrabold px-2 py-1 rounded-lg ${stat.trendUp ? 'text-emerald-400 bg-emerald-400/10' : 'text-rose-400 bg-rose-400/10'}`}>
                 <span>{stat.trend}</span>
-                {stat.trendUp ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+                {stat.trendUp ? <ArrowUpRight size={14} strokeWidth={3} /> : <ArrowDownRight size={14} strokeWidth={3} />}
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-text-dim text-sm font-semibold tracking-wide uppercase">{stat.label}</p>
-              <h2 className="text-3xl font-bold text-text-main mt-1 tracking-tight">{stat.value}</h2>
+            <div className="mt-5">
+              <p className="text-text-dim text-[11px] font-bold tracking-widest uppercase opacity-70 leading-none">{stat.label}</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-text-main mt-1 tracking-tighter">{stat.value}</h2>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 gap-6 sm:gap-8 laptop:grid-cols-1">
         {/* Revenue Chart */}
-        <div className="w-full">
-          <Card title="Revenue Growth" subtitle="Monthly earnings overview" className="h-full">
-            <div className="h-[300px] w-full mt-4">
+        <div className="w-full h-full">
+          <Card 
+            title="Revenue Insight" 
+            subtitle="Financial growth trends" 
+            className="h-full border-border-accent/50"
+          >
+            <div className="h-[250px] sm:h-[300px] tablet:h-[350px] w-full mt-6">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={CHART_DATA}>
                   <defs>

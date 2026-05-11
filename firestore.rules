@@ -76,12 +76,13 @@ service cloud.firestore {
 
     function isValidActivity(data) {
       return data.keys().hasAll(['userId', 'type', 'action', 'target', 'timestamp'])
-        && data.keys().size() == 5
+        && data.keys().size() >= 5 && data.keys().size() <= 6
         && data.userId == request.auth.uid
-        && data.type in ['project', 'task', 'invoice', 'client']
+        && data.type in ['project', 'task', 'invoice', 'client', 'notification']
         && isValidString(data.action, 100)
         && isValidString(data.target, 200)
-        && (data.timestamp is string && data.timestamp.size() <= 100);
+        && (data.timestamp is string && data.timestamp.size() <= 100)
+        && (data.get('priority', 'medium') in ['low', 'medium', 'high', 'urgent']);
     }
 
     // -------------------------------------------------------------------------

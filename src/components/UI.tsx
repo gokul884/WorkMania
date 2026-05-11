@@ -13,15 +13,15 @@ export function Card({ children, title, subtitle, className = '', headerAction }
   return (
     <div className={`card-base ${className}`}>
       {(title || subtitle || headerAction) && (
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+        <div className="px-4 sm:px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
           <div>
-            {title && <h3 className="font-bold text-slate-100">{title}</h3>}
-            {subtitle && <p className="text-sm text-slate-400">{subtitle}</p>}
+            {title && <h3 className="font-bold text-slate-100 text-sm sm:text-base leading-snug">{title}</h3>}
+            {subtitle && <p className="text-xs sm:text-sm text-slate-400 mt-0.5">{subtitle}</p>}
           </div>
-          {headerAction && <div>{headerAction}</div>}
+          {headerAction && <div className="ml-2">{headerAction}</div>}
         </div>
       )}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {children}
       </div>
     </div>

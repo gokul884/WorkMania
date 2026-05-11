@@ -62,10 +62,11 @@
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
-        "type": { "type": "string", "enum": ["project", "task", "invoice", "client"] },
+        "type": { "type": "string", "enum": ["project", "task", "invoice", "client", "notification"] },
         "action": { "type": "string" },
         "target": { "type": "string" },
-        "timestamp": { "type": "string" }
+        "timestamp": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] }
       },
       "required": ["userId", "type", "action", "target", "timestamp"]
     },

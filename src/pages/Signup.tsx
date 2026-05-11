@@ -164,7 +164,7 @@ export default function Signup() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full btn-primary py-3 sm:py-3.5 text-base sm:text-lg flex items-center justify-center gap-2 mt-2 disabled:opacity-50 shadow-xl shadow-primary/25"
+            className="w-full btn-primary py-3 sm:py-3.5 text-base sm:text-lg flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
           >
             {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} />
           </button>

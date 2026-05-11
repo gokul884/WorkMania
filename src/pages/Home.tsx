@@ -16,8 +16,8 @@ export default function Home() {
             <span className="font-bold text-lg md:text-xl tracking-tight text-text-main">WorkMania</span>
           </div>
           <div className="flex items-center gap-3 sm:gap-6">
-            <Link to="/login" className="text-xs sm:text-sm font-bold text-text-dim hover:text-text-main transition-colors uppercase tracking-wider">Log In</Link>
-            <Link to="/signup" className="btn-primary py-1.5 px-4 sm:px-6 text-xs sm:text-sm shadow-lg shadow-primary/20">Join for Free</Link>
+            <Link to="/login" className="text-xs sm:text-sm font-medium text-text-dim hover:text-text-main transition-colors">Log In</Link>
+            <Link to="/signup" className="btn-primary py-1.5 px-4 sm:px-6 text-xs sm:text-sm">Join for Free</Link>
           </div>
         </div>
       </nav>
@@ -41,10 +41,10 @@ export default function Home() {
               The all-in-one workspace for freelancers. Manage projects, clients, tasks, and invoices with a clean, high-polished interface designed for speed.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/signup" className="btn-primary py-3.5 sm:py-4 px-8 text-base sm:text-lg w-full sm:w-auto flex items-center justify-center gap-2 shadow-xl shadow-primary/25">
+              <Link to="/signup" className="btn-primary py-3.5 sm:py-4 px-8 text-base sm:text-lg w-full sm:w-auto flex items-center justify-center gap-2">
                 Get Started Now <ArrowRight size={20} />
               </Link>
-              <button className="btn-secondary py-3.5 sm:py-4 px-8 text-base sm:text-lg w-full sm:w-auto bg-white/5 border-white/10 hover:bg-white/10">
+              <button className="btn-secondary py-3.5 sm:py-4 px-8 text-base sm:text-lg w-full sm:w-auto">
                 Watch Demo
               </button>
             </div>

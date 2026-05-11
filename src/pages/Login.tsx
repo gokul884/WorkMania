@@ -136,7 +136,7 @@ export default function Login() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full btn-primary py-3 sm:py-3.5 text-base sm:text-lg flex items-center justify-center gap-2 mt-2 disabled:opacity-50 shadow-xl shadow-primary/20"
+            className="w-full btn-primary py-3 sm:py-3.5 text-base sm:text-lg flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
           >
             {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={20} />
           </button>

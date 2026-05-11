@@ -79,100 +79,101 @@ export default function Signup() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 blur-[150px] rounded-full pointer-events-none -z-10" />
 
       <Link to="/" className="flex items-center gap-2 mb-8 group">
-        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-slate-900 group-hover:scale-110 transition-transform">
+        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-slate-900 group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">
           <Briefcase size={24} />
         </div>
-        <span className="font-bold text-2xl tracking-tight text-white">WorkMania</span>
+        <span className="font-bold text-2xl tracking-tighter text-text-main">WorkMania</span>
       </Link>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg bg-bg-card border border-border-accent rounded-3xl p-8 shadow-2xl"
+        className="w-full max-w-lg bg-bg-card border border-border-accent rounded-3xl p-8 shadow-2xl relative overflow-hidden"
       >
+        <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-slate-400 text-sm">Join thousands of freelancers working smarter</p>
+          <h1 className="text-3xl font-bold text-text-main mb-2">Create Account</h1>
+          <p className="text-text-dim text-sm font-medium">Join thousands of freelancers working smarter</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
           {errors.signup && (
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm p-3 rounded-xl mb-6">
+            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm p-3 rounded-xl mb-6 font-medium">
               {errors.signup}
             </div>
           )}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300 ml-1">Full Name</label>
+            <label className="text-xs font-bold text-text-dim uppercase tracking-widest ml-1">Full Name</label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" size={18} />
               <input 
                 type="text" 
                 required 
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 disabled={loading}
-                className={`w-full bg-slate-900/50 border ${errors.name ? 'border-rose-500' : 'border-slate-700/50'} rounded-xl pl-10 pr-4 py-3 text-slate-100 outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50`}
+                className={`w-full bg-bg-deep border ${errors.name ? 'border-rose-500' : 'border-border-accent'} rounded-xl pl-10 pr-4 py-3 text-text-main outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 font-medium`}
                 placeholder="Robert Fox"
               />
             </div>
-            {errors.name && <p className="text-rose-500 text-xs ml-1">{errors.name}</p>}
+            {errors.name && <p className="text-rose-500 text-xs ml-1 font-bold">！ {errors.name}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
+            <label className="text-xs font-bold text-text-dim uppercase tracking-widest ml-1">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" size={18} />
               <input 
                 type="email" 
                 required 
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 disabled={loading}
-                className={`w-full bg-slate-900/50 border ${errors.email ? 'border-rose-500' : 'border-slate-700/50'} rounded-xl pl-10 pr-4 py-3 text-slate-100 outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50`}
+                className={`w-full bg-bg-deep border ${errors.email ? 'border-rose-500' : 'border-border-accent'} rounded-xl pl-10 pr-4 py-3 text-text-main outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 font-medium`}
                 placeholder="robert@example.com"
               />
             </div>
-            {errors.email && <p className="text-rose-500 text-xs ml-1">{errors.email}</p>}
+            {errors.email && <p className="text-rose-500 text-xs ml-1 font-bold">！ {errors.email}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300 ml-1">Password</label>
+            <label className="text-xs font-bold text-text-dim uppercase tracking-widest ml-1">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" size={18} />
               <input 
                 type="password" 
                 required 
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 disabled={loading}
-                className={`w-full bg-slate-900/50 border ${errors.password ? 'border-rose-500' : 'border-slate-700/50'} rounded-xl pl-10 pr-4 py-3 text-slate-100 outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50`}
+                className={`w-full bg-bg-deep border ${errors.password ? 'border-rose-500' : 'border-border-accent'} rounded-xl pl-10 pr-4 py-3 text-text-main outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50 font-medium`}
                 placeholder="••••••••"
               />
             </div>
             <PasswordStrength password={formData.password} />
-            {errors.password && <p className="text-rose-500 text-xs ml-1">{errors.password}</p>}
+            {errors.password && <p className="text-rose-500 text-xs ml-1 font-bold">！ {errors.password}</p>}
           </div>
 
           <div className="flex items-start gap-2 py-2">
-            <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-slate-700 bg-slate-900 text-primary focus:ring-primary" />
-            <label className="text-xs text-slate-500 leading-normal">
-              I agree to the <span className="text-primary hover:underline cursor-pointer">Terms of Service</span> and <span className="text-primary hover:underline cursor-pointer">Privacy Policy</span>.
+            <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-border-accent bg-bg-deep text-primary focus:ring-primary" />
+            <label className="text-xs text-text-dim leading-normal font-medium">
+              I agree to the <span className="text-primary font-bold hover:underline cursor-pointer">Terms of Service</span> and <span className="text-primary font-bold hover:underline cursor-pointer">Privacy Policy</span>.
             </label>
           </div>
 
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full btn-primary py-3.5 text-lg flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+            className="w-full btn-primary py-3 sm:py-3.5 text-base sm:text-lg flex items-center justify-center gap-2 mt-2 disabled:opacity-50 shadow-xl shadow-primary/25"
           >
             {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} />
           </button>
         </form>
 
         <div className="mt-8 flex items-center gap-4">
-          <div className="flex-1 h-px bg-slate-800"></div>
-          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Or continue with</span>
-          <div className="flex-1 h-px bg-slate-800"></div>
+          <div className="flex-1 h-px bg-border-accent opacity-50"></div>
+          <span className="text-[10px] text-text-dim font-bold uppercase tracking-widest">Or continue with</span>
+          <div className="flex-1 h-px bg-border-accent opacity-50"></div>
         </div>
 
         <div className="flex flex-col gap-4 mt-6">
@@ -180,15 +181,15 @@ export default function Signup() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full btn-secondary py-3.5 flex items-center justify-center gap-3 text-base font-semibold hover:bg-white/10 transition-all border-slate-700/50"
+            className="w-full btn-secondary py-3.5 flex items-center justify-center gap-3 text-sm font-bold border-border-accent hover:bg-white/5 shadow-sm"
           >
             <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
             Continue with Google
           </button>
         </div>
 
-        <p className="mt-8 text-center text-slate-400 text-sm">
-          Already have an account? <Link to="/login" className="text-primary font-bold hover:text-cyan-300 transition-colors">Log In</Link>
+        <p className="mt-8 text-center text-text-dim text-sm font-medium">
+          Already have an account? <Link to="/login" className="text-primary font-bold hover:text-primary-dark transition-colors">Log In</Link>
         </p>
       </motion.div>
     </div>

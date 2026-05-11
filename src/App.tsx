@@ -123,6 +123,11 @@ export default function App() {
     return () => unsubscribeAuth();
   }, []);
 
+  const currentThemeRef = React.useRef(theme);
+  useEffect(() => {
+    currentThemeRef.current = theme;
+  }, [theme]);
+
   // Firestore Sync
   useEffect(() => {
     if (!user) {
@@ -178,7 +183,7 @@ export default function App() {
         setProfile(data as any);
         
         // Persist theme from Firestore if available
-        if (data.theme) {
+        if (data.theme && data.theme !== currentThemeRef.current) {
           setTheme(data.theme);
           localStorage.setItem('theme', data.theme);
         }

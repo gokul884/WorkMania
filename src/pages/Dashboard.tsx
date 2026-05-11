@@ -36,7 +36,7 @@ export default function Dashboard({ clients, projects, invoices, activities }: D
       { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString()}`, icon: TrendingUp, color: 'text-primary', bg: 'bg-primary/10', trend: '0%', trendUp: true },
       { label: 'Active Projects', value: activeProjects, icon: Briefcase, color: 'text-success', bg: 'bg-emerald-500/10', trend: '0', trendUp: true },
       { label: 'Pending Invoices', value: `$${pendingRevenue.toLocaleString()}`, icon: Clock, color: 'text-warning', bg: 'bg-amber-500/10', trend: '0%', trendUp: false },
-      { label: 'Total Clients', value: totalClients, icon: Users, color: 'text-slate-300', bg: 'bg-white/5', trend: '0', trendUp: true },
+      { label: 'Total Clients', value: totalClients, icon: Users, color: 'text-text-main', bg: 'bg-white/5', trend: '0', trendUp: true },
     ];
   }, [invoices, projects, clients]);
 

@@ -24,10 +24,12 @@ service cloud.firestore {
     
     function isValidUserProfile(data) {
       return data.keys().hasAll(['displayName'])
-        && data.keys().size() >= 1 && data.keys().size() <= 3
+        && data.keys().size() >= 1 && data.keys().size() <= 5
         && isValidString(data.displayName, 100)
         && (data.get('bio', '') is string && data.get('bio', '').size() <= 500)
-        && (data.get('avatarUrl', '') is string && data.get('avatarUrl', '').size() <= 2048);
+        && (data.get('avatarUrl', '') is string && data.get('avatarUrl', '').size() <= 200000)
+        && (data.get('theme', 'dark') in ['light', 'dark'])
+        && (data.get('updatedAt', '') is string && data.get('updatedAt', '').size() <= 100);
     }
 
     function isValidClient(data) {
@@ -37,7 +39,7 @@ service cloud.firestore {
         && isValidString(data.name, 100)
         && isValidString(data.email, 150)
         && isValidString(data.company, 150)
-        && (data.get('avatar', '') is string && data.get('avatar', '').size() <= 2048);
+        && (data.get('avatar', '') is string && data.get('avatar', '').size() <= 200000);
     }
 
     function isValidProject(data) {

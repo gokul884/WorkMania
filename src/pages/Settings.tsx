@@ -114,6 +114,19 @@ export default function Settings({ user, theme, setTheme }: SettingsProps) {
     setImageToCrop(null);
   };
 
+  const handleThemeChange = async (newTheme: 'dark' | 'light') => {
+    setTheme(newTheme);
+    if (!user) return;
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        theme: newTheme,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Error saving theme preference:', error);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) return;
     setIsSaving(true);
@@ -222,14 +235,14 @@ export default function Settings({ user, theme, setTheme }: SettingsProps) {
                   </div>
                   <div className="flex bg-bg-card p-1 rounded-xl border border-border-accent">
                     <button 
-                      onClick={() => setTheme('dark')}
+                      onClick={() => handleThemeChange('dark')}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${theme === 'dark' ? 'bg-primary text-white dark:text-slate-900 shadow-lg font-bold' : 'text-text-dim hover:text-text-main'}`}
                     >
                       <Moon size={16} />
                       <span className="text-xs">Dark</span>
                     </button>
                     <button 
-                      onClick={() => setTheme('light')}
+                      onClick={() => handleThemeChange('light')}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${theme === 'light' ? 'bg-primary text-white dark:text-slate-900 shadow-lg font-bold' : 'text-text-dim hover:text-text-main'}`}
                     >
                       <Sun size={16} />

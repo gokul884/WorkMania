@@ -176,8 +176,11 @@ export default function App() {
       if (doc.exists()) {
         const data = doc.data();
         setProfile(data as any);
+        
+        // Persist theme from Firestore if available
         if (data.theme) {
           setTheme(data.theme);
+          localStorage.setItem('theme', data.theme);
         }
       }
     }, (error) => {
@@ -382,12 +385,12 @@ function DashboardLayout({ children, isSidebarOpen, setIsSidebarOpen, user, prof
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-text-dim hover:text-text-main rounded-xl hover:bg-white/5 transition-all">
               <Menu size={22} />
             </button>
-            <span className="font-extrabold text-xl text-primary tracking-tighter">WM</span>
+            <span className="font-black text-2xl text-primary tracking-tighter">WM</span>
           </div>
 
-          <div className="flex-1 max-w-md hidden md:block mx-8">
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim" />
+          <div className="flex-1 max-w-xl hidden md:block mx-12">
+            <div className="relative group">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-dim group-focus-within:text-primary transition-colors" />
               <input 
                 type="text" 
                 placeholder="Search everything..." 

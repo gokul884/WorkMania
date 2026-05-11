@@ -7,7 +7,7 @@ import {
   deleteDoc, 
   doc 
 } from 'firebase/firestore';
-import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Card } from '../components/UI';
 import { Modal } from '../components/Modal';
 import { Client, Activity } from '../types';

@@ -32,6 +32,7 @@ export default function Settings({ user, theme, setTheme }: SettingsProps) {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
+      
       try {
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
@@ -117,8 +118,10 @@ export default function Settings({ user, theme, setTheme }: SettingsProps) {
   const handleThemeChange = async (newTheme: 'dark' | 'light') => {
     setTheme(newTheme);
     if (!user) return;
+    
     try {
       await setDoc(doc(db, 'users', user.uid), {
+        displayName: displayName || user.displayName || 'User',
         theme: newTheme,
         updatedAt: new Date().toISOString()
       }, { merge: true });
@@ -130,6 +133,7 @@ export default function Settings({ user, theme, setTheme }: SettingsProps) {
   const handleSave = async () => {
     if (!user) return;
     setIsSaving(true);
+    
     try {
       await setDoc(doc(db, 'users', user.uid), {
         displayName,

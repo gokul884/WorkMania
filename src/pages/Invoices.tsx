@@ -7,7 +7,7 @@ import {
   deleteDoc, 
   doc 
 } from 'firebase/firestore';
-import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Card, Badge } from '../components/UI';
 import { Modal } from '../components/Modal';
 import { Invoice, Client, InvoiceStatus } from '../types';
@@ -37,6 +37,7 @@ export default function Invoices({ invoices, clients, user }: InvoicesProps) {
     if (!user) return;
 
     const formData = new FormData(e.currentTarget);
+    const invoiceId = `INV-${Math.floor(1000 + Math.random() * 9000)}`;
     const invoiceData = {
       userId: user.uid,
       clientId: formData.get('clientId') as string,
@@ -44,6 +45,7 @@ export default function Invoices({ invoices, clients, user }: InvoicesProps) {
       status: 'unpaid',
       date: format(new Date(), 'yyyy-MM-dd'),
       dueDate: formData.get('dueDate') as string,
+      id: invoiceId
     };
 
     try {

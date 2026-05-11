@@ -24,7 +24,6 @@ import {
   onSnapshot, 
   query, 
   where, 
-  orderBy,
   doc,
   getDocFromServer
 } from 'firebase/firestore';
@@ -139,50 +138,50 @@ export default function App() {
       return;
     }
 
-    const qClients = query(collection(db, 'clients'), where('userId', '==', user.uid));
+    const userId = user.uid;
+
+    const qClients = query(collection(db, 'clients'), where('userId', '==', userId));
     const unsubscribeClients = onSnapshot(qClients, (snapshot) => {
       setClients(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client)));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'clients');
     });
 
-    const qProjects = query(collection(db, 'projects'), where('userId', '==', user.uid));
+    const qProjects = query(collection(db, 'projects'), where('userId', '==', userId));
     const unsubscribeProjects = onSnapshot(qProjects, (snapshot) => {
       setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project)));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'projects');
     });
 
-    const qTasks = query(collection(db, 'tasks'), where('userId', '==', user.uid));
+    const qTasks = query(collection(db, 'tasks'), where('userId', '==', userId));
     const unsubscribeTasks = onSnapshot(qTasks, (snapshot) => {
       setTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task)));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'tasks');
     });
 
-    const qInvoices = query(collection(db, 'invoices'), where('userId', '==', user.uid));
+    const qInvoices = query(collection(db, 'invoices'), where('userId', '==', userId));
     const unsubscribeInvoices = onSnapshot(qInvoices, (snapshot) => {
       setInvoices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice)));
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'invoices');
     });
 
-    const qActivities = query(collection(db, 'activities'), where('userId', '==', user.uid));
+    const qActivities = query(collection(db, 'activities'), where('userId', '==', userId));
     const unsubscribeActivities = onSnapshot(qActivities, (snapshot) => {
       const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
-      // Sort client-side to avoid missing index error
       docs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       setActivities(docs);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'activities');
     });
 
-    const unsubscribeProfile = onSnapshot(doc(db, 'users', user.uid), (doc) => {
+    const unsubscribeProfile = onSnapshot(doc(db, 'users', userId), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         setProfile(data as any);
         
-        // Persist theme from Firestore if available
         if (data.theme && data.theme !== currentThemeRef.current) {
           setTheme(data.theme);
           localStorage.setItem('theme', data.theme);

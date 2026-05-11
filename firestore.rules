@@ -23,9 +23,8 @@ service cloud.firestore {
     // -------------------------------------------------------------------------
     
     function isValidUserProfile(data) {
-      return data.keys().hasAll(['displayName'])
-        && data.keys().size() >= 1 && data.keys().size() <= 5
-        && isValidString(data.displayName, 100)
+      return (data.get('displayName', '') is string && data.get('displayName', '').size() <= 100)
+        && data.keys().size() >= 1 && data.keys().size() <= 8
         && (data.get('bio', '') is string && data.get('bio', '').size() <= 500)
         && (data.get('avatarUrl', '') is string && data.get('avatarUrl', '').size() <= 200000)
         && (data.get('theme', 'dark') in ['light', 'dark'])
@@ -100,10 +99,10 @@ service cloud.firestore {
     
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow list: if false; // Profiles shouldn't be listable by others
+      allow list: if false; 
       allow create: if isOwner(userId) && isValidUserProfile(incoming());
       allow update: if isOwner(userId) && isValidUserProfile(incoming())
-        && incoming().diff(existing()).affectedKeys().hasAny(['displayName', 'bio', 'avatarUrl']);
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'bio', 'avatarUrl', 'theme', 'updatedAt']);
     }
 
     match /clients/{clientId} {

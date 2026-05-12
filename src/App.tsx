@@ -76,9 +76,9 @@ export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
-      return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+      return (saved === 'light' || saved === 'dark') ? saved : 'light';
     }
-    return 'dark';
+    return 'light';
   });
   const [deadlineReminders, setDeadlineReminders] = useState<string[]>([]);
 
